@@ -5,7 +5,7 @@ class Task
 
     private string prompt;
     private bool completed;
-    private DateTime creationDT;
+    private readonly DateTime creationDT;
     /*
     When should this task be finished,
     or when is it due,
@@ -22,13 +22,28 @@ class Task
         this.associatedDT = associatedDT;
     }
 
-    public string Prompt {get; set;}
+    public string Prompt 
+    {
+        get => prompt;
+        set {prompt = value;}
+    }
 
-    public bool Completed {get; set;}
+    public bool Completed
+    {
+        get => completed;
+        set {completed = value;}
+    }
 
-    public DateTime CreationDT {get;}
+    public DateTime CreationDT
+    {
+        get => creationDT;
+    }
 
-    public DateTime AssociatedTD {get; set;}
+    public DateTime? AssociatedTD
+    {
+        get => associatedDT;
+        set {associatedDT = value;}
+    }
 
     public override string ToString()
     {
