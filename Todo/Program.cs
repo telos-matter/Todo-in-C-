@@ -1,7 +1,45 @@
-﻿List<Task> tasks = [];
-List<Task> completed = [];
+﻿using System.Text.Json;
 
-// Define used functions
+
+const string FILE_NAME = "tasks.json";
+
+
+// Initialize
+List<Task> tasks;
+
+// Deserialize data from the file
+if (File.Exists(FILE_NAME))
+{
+    var jsonText = File.ReadAllText(FILE_NAME);
+    tasks = JsonSerializer.Deserialize<List<Task>>(jsonText)!;
+}
+else
+{
+    // If it does not exist then just initialize an empty list
+    tasks = [];
+}
+
+
+// Define needed / used functions
+Task getTask (int id)
+{
+    foreach (var task in tasks)
+    {
+        if (task.Id == id)
+        {
+            return task;
+        }
+    }
+
+    return null;
+}
+
+void serialize ()
+{
+    string jsonString = JsonSerializer.Serialize(tasks);
+    File.WriteAllText(FILE_NAME, jsonString);
+}
+
 char ReadCharClear ()
 {
     char c = Console.ReadKey().KeyChar;
@@ -11,11 +49,11 @@ char ReadCharClear ()
 
 void AddTask ()
 {
-    Console.WriteLine("Write your Todo:");
+    Console.WriteLine("What is this Task about? 🤔");
     string? prompt = Console.ReadLine();
     prompt ??= "";
     // Eh, a DateTime is too much, just Date
-    Console.WriteLine("Is it due to some date? If yes, give the date (dd/mm/yyyy), otherwise press enter");
+    Console.WriteLine("Is it due some day? If so, give the date (dd/mm/yyyy), otherwise press enter. 📅");
     string? dateString = Console.ReadLine();
     DateTime? associatedDT = null;
     try
@@ -24,73 +62,88 @@ void AddTask ()
     }
     catch (FormatException) {}
 
-    Task task = new(prompt, associatedDT);
+    Task task = new(tasks.Count +1, prompt, associatedDT);
     tasks.Add(task);
-    Console.WriteLine("Task added successfully!");
+    serialize();
+    Console.WriteLine("Task added successfully! 💯");
 }
 
-void SeeTasks ()
+/*
+Returns if true if there was a none completed task and
+thus it was shown. Otherwise false.
+*/
+bool SeeTasks ()
 {
-    if (tasks.Count == 0)
+    bool showedNothing = true;
+
+    foreach (var task in tasks)
     {
-        Console.WriteLine("No Todos.");
-        return;
+        if (task.Completed)
+        {
+            continue;
+        }
+        Console.WriteLine(task);
+        showedNothing = false;
     }
 
-    for (int i = 0; i < tasks.Count; i++)
+    if (showedNothing)
     {
-        Console.WriteLine($"#{i}");
-        Console.WriteLine(tasks[i]);
+        Console.WriteLine("No Tasks. Write something 😊");
     }
+
+    return !showedNothing;
 }
 
 void MarkCompleted ()
 {   
-    if (tasks.Count == 0)
+    if (!SeeTasks())
     {
-        Console.WriteLine("No Todos available.");
         return;
     }
 
-    SeeTasks();
     Console.WriteLine();
-    Console.WriteLine("Which Todo have you completed?");
+    Console.WriteLine("Which Task have you completed?");
     var input = Console.ReadLine();
-    int taskNumber = -1;
+    int taskID;
     try
     {
-        taskNumber = Convert.ToInt32(input);
+        taskID = Convert.ToInt32(input);
     }
     catch (FormatException)
     {
-        Console.WriteLine($"Invalid input {input}");
+        Console.WriteLine($"Invalid input {input} ❌");
+        return;
     }
-    if (taskNumber >= 0 && taskNumber < tasks.Count)
+
+    Task task = getTask(taskID);
+    if (task == null)
     {
-        Task task = tasks[taskNumber];
-        task.Completed = true;
-        tasks.RemoveAt(taskNumber);
-        completed.Add(task);
-        Console.WriteLine($"#{taskNumber} marked as completed!");
+        Console.WriteLine($"Unknown Task {taskID}");
     }
     else
     {
-        Console.WriteLine($"Unknown Todo {taskNumber}");
+        task.Completed = true;
+        serialize();
+        Console.WriteLine($"#{taskID} completed! 🎉");
     }
 }
 
 void SeeCompleted ()
 {
-    if (completed.Count == 0)
+    bool showedNothing = true;
+
+    foreach (var task in tasks)
     {
-        Console.WriteLine("Yet to complete a Todo. Go do something!");
-        return;
+        if (task.Completed)
+        {
+            Console.WriteLine(task);
+            showedNothing = false;
+        }
     }
 
-    for (int i = 0; i < completed.Count; i++)
+    if (showedNothing)
     {
-        Console.WriteLine($"#{i}");
-        Console.WriteLine(completed[i]);
+        Console.WriteLine("No Task is yet completed. Go finish a Task 🫡");
     }
 }
 
@@ -98,20 +151,18 @@ void SeeDue ()
 {
     bool showedNothing = true;
     DateTime now = DateTime.Now;
-    for (int i = 0; i < tasks.Count; i++)
+    foreach (var task in tasks)
     {
-        Task task =  tasks[i];
-        if (task.AssociatedTD.HasValue && task.AssociatedTD.Value < now)
+        if (!task.Completed && task.AssociatedTD.HasValue && task.AssociatedTD.Value < now)
         {
             showedNothing = false;
-            Console.WriteLine($"#{i}");
-            Console.WriteLine(tasks[i]);
+            Console.WriteLine(task);
         }
     }
 
     if (showedNothing)
     {
-        Console.WriteLine("No Todo is due right now.");
+        Console.WriteLine("No Task is due at the moment. 👌🏼");
     }
 }
 
