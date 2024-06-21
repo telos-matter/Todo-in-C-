@@ -71,15 +71,19 @@ class Task
         set {_associatedDT = value;}
     }
 
-    // TODO more user friendly ToString
     public override string ToString()
     {
+        var timeSpan = DateTime.Now - _creationDT;
+        timeSpan = new TimeSpan(timeSpan.Days, timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds);
+
         StringBuilder sb = new();
-        sb.Append($"ID: {_id}\n");
-        sb.Append($"Prompt: `{_prompt}`\n");
-        sb.Append($"Completed: {_completed}\n");
-        sb.Append($"CreationDT: {_creationDT}\n");
-        sb.Append($"AssociatedDT: {_associatedDT}");
+        sb.Append($"#{_id} - Created {timeSpan} ago\n");
+        sb.Append($"{_prompt}\n");
+        if (_associatedDT.HasValue)
+        {
+            sb.Append($"-> Due {_associatedDT}\n");
+        }
+
         sb.Replace("\n", Environment.NewLine);
         return sb.ToString();
     }
