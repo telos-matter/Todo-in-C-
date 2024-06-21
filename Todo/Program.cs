@@ -21,7 +21,7 @@ else
 
 
 // Define needed / used functions
-Task getTask (int id)
+Task? getTask (int id)
 {
     foreach (var task in tasks)
     {
@@ -115,7 +115,7 @@ void MarkCompleted ()
         return;
     }
 
-    Task task = getTask(taskID);
+    Task? task = getTask(taskID);
     if (task == null)
     {
         Console.WriteLine($"Unknown Task {taskID}");
