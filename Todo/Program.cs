@@ -167,17 +167,19 @@ void SeeDue ()
 }
 
 // "Main"
-Console.WriteLine("Welcome!");
+Console.Clear();
+Console.WriteLine($"Welcome! 👋🏼{Environment.NewLine}");
+
 bool running = true;
 while (running)
 {
     Console.WriteLine("What would you like to do?");
-    Console.WriteLine("#1 Add a Todo");
-    Console.WriteLine("#2 See all Todos");
-    Console.WriteLine("#3 Mark a Todo as completed");
-    Console.WriteLine("#4 See all completed Todos");
-    Console.WriteLine("#5 See due Todos");
-    Console.WriteLine("#6 Exit");
+    Console.WriteLine("#1 Add a Task 📝");
+    Console.WriteLine("#2 See all your Tasks 📋");
+    Console.WriteLine("#3 Mark a Task as completed ✅");
+    Console.WriteLine("#4 See all completed Tasks 💯");
+    Console.WriteLine("#5 See due Tasks 📅");
+    Console.WriteLine("#6 Exit 🚪");
     
     char choice = ReadCharClear();
     
@@ -203,7 +205,7 @@ while (running)
             SeeDue();
             break;
         
-        case '6':
+        case '6': case 'q':
             running = false;
             break;
         
